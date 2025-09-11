@@ -1,5 +1,9 @@
 let userId = null;
 
+// --- IMPORTANT: Replace this with your actual Render backend URL ---
+// Example: const BASE_URL = "https://your-recharge-app-backend.onrender.com";
+const BASE_URL = "https://recharge-app-live.onrender.com"; // Your main Render app URL
+
 function showLoading() {
     document.getElementById('loading-spinner').style.display = 'flex';
 }
@@ -30,8 +34,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     } catch (e) {
         console.error("DOM elements not found on page load:", e);
     } finally {
-        // এই লাইনটি যোগ করা হয়েছে 'loading' স্পিনারটি লুকানোর জন্য
-        hideLoading(); 
+        hideLoading();
     }
 });
 
@@ -72,7 +75,7 @@ document.getElementById('auth-form').addEventListener('submit', async function(e
         return;
     }
 
-    let endpoint = isLogin ? '/login' : '/signup';
+    let endpoint = isLogin ? `${BASE_URL}/login` : `${BASE_URL}/signup`; // BASE_URL added
     let bodyData;
 
     if (isLogin) {
@@ -181,7 +184,7 @@ document.getElementById('forgot-password-form').addEventListener('submit', async
     
     showLoading();
     try {
-        const response = await fetch('/forgot-password', {
+        const response = await fetch(`${BASE_URL}/forgot-password`, { // BASE_URL added
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ mobileNumber, newPassword }),
@@ -215,7 +218,7 @@ document.getElementById('rechargeForm').addEventListener('submit', async functio
 
     showLoading();
     try {
-        const response = await fetch('/recharge', {
+        const response = await fetch(`${BASE_URL}/recharge`, { // BASE_URL added
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId, mobileNumber, operator, amount: Number(amount) }),
@@ -261,7 +264,8 @@ async function startPayment() {
     
     showLoading();
     try {
-        const userResponse = await fetch(`http://localhost:3000/user/${userId}`);
+        // BASE_URL added here
+        const userResponse = await fetch(`${BASE_URL}/user/${userId}`); 
         const userData = await userResponse.json();
         if(!userData.success) {
             alert("User details nahi mil payi!");
@@ -269,7 +273,8 @@ async function startPayment() {
         }
         const { name, email, mobileNumber } = userData.user;
 
-        const orderResponse = await fetch('http://localhost:3000/createOrder', {
+        // BASE_URL added here
+        const orderResponse = await fetch(`${BASE_URL}/createOrder`, { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -280,7 +285,7 @@ async function startPayment() {
         
         if (orderData.id) {
             const options = {
-                key: 'rzp_test_REG7HP4iXJBXHc',
+                key: 'rzp_test_REG7HP4iXJBXHc', // This key should ideally also come from an environment variable for security
                 amount: orderData.amount,
                 currency: "INR",
                 name: "Recharge App",
@@ -289,7 +294,8 @@ async function startPayment() {
                 handler: async function (response) {
                     alert("Payment Successful!");
                     
-                    const updateResponse = await fetch('http://localhost:3000/add-balance', {
+                    // BASE_URL added here
+                    const updateResponse = await fetch(`${BASE_URL}/add-balance`, { 
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -332,7 +338,8 @@ async function fetchPlans(operator) {
     try {
         const plansContainer = document.getElementById('plansContainer');
         plansContainer.innerHTML = '';
-        const response = await fetch(`/plans/${operator}`);
+        // BASE_URL added here
+        const response = await fetch(`${BASE_URL}/plans/${operator}`); 
         const data = await response.json();
 
         if (response.ok && data.plans && data.plans.length > 0) {
@@ -362,7 +369,8 @@ async function fetchHistory() {
     try {
         const historyList = document.getElementById('historyList');
         historyList.innerHTML = '';
-        const response = await fetch(`/history/${userId}`);
+        // BASE_URL added here
+        const response = await fetch(`${BASE_URL}/history/${userId}`); 
         const data = await response.json();
         
         if (response.ok) {
@@ -410,7 +418,8 @@ async function fetchHistory() {
 
 async function updateWalletBalance() {
     try {
-        const response = await fetch(`/wallet/${userId}`);
+        // BASE_URL added here
+        const response = await fetch(`${BASE_URL}/wallet/${userId}`); 
         const data = await response.json();
 
         if (response.ok) {
