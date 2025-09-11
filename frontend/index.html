@@ -1,321 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mobile Recharge</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-        }
-        h2, h3 {
-            text-align: center;
-            color: #333;
-        }
-        .wallet-container {
-            background-color: #e9f5ff;
-            border: 1px solid #c2e2ff;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .wallet-title {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 5px;
-        }
-        .wallet-amount {
-            font-size: 28px;
-            font-weight: bold;
-            color: #007bff;
-        }
-        .recharge-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .recharge-form label {
-            font-weight: bold;
-            color: #555;
-        }
-        .recharge-form input, .recharge-form select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-        .recharge-form button {
-            padding: 12px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .recharge-form button:hover {
-            background-color: #0056b3;
-        }
-        .history-list-container {
-            margin-top: 30px;
-        }
-        .history-list {
-            list-style-type: none;
-            padding: 0;
-        }
-        .history-item {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #eee;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .history-details {
-            display: flex;
-            flex-direction: column;
-        }
-        .history-main {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-        }
-        .history-sub {
-            font-size: 12px;
-            color: #777;
-        }
-        .history-amount {
-            font-size: 18px;
-            font-weight: bold;
-            color: #28a745;
-        }
-        .recharge-actions {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        /* Plans Container ke liye style */
-        #plansContainer {
-            margin-top: 15px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
-        .plan-card {
-            background-color: #eaf5ff;
-            border: 1px solid #cce5ff;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: center;
-            transition: background-color 0.2s;
-            width: 150px; /* Card size */
-        }
-        .plan-card:hover {
-            background-color: #d1eaff;
-        }
-        .plan-amount {
-            font-weight: bold;
-            font-size: 18px;
-            color: #007bff;
-        }
-        .plan-description {
-            font-size: 12px;
-            color: #555;
-            margin-top: 5px;
-        }
-        
-        /* Login and Signup forms ke liye styles */
-        #auth-container {
-            width: 100%;
-            max-width: 400px;
-            margin: auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        #auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .auth-input {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .auth-button {
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        /* Loading Spinner ke liye style */
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Responsive design ke liye media queries */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            .recharge-form button {
-                font-size: 14px;
-                padding: 10px;
-            }
-            .wallet-amount {
-                font-size: 24px;
-            }
-        }
-        @media (max-width: 480px) {
-            .container {
-                padding: 10px;
-            }
-            .recharge-form label {
-                font-size: 14px;
-            }
-            .recharge-form input, .recharge-form select {
-                padding: 8px;
-                font-size: 14px;
-            }
-            .history-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-    </style>
+    <title>Recharge App</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
     <div id="loading-spinner" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column;">
         <div class="loading-spinner"></div>
         <p>Loading...</p>
     </div>
-    <div class="container">
-        <div id="profile-page" style="display:none; padding: 20px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 20px;">
-            <h3>User Profile</h3>
-            <p><strong>Name:</strong> <span id="profile-name"></span></p>
-            <p><strong>Mobile:</strong> <span id="profile-mobile"></span></p>
-            <p><strong>Email:</strong> <span id="profile-email"></span></p>
-            <p><strong>Address:</strong> <span id="profile-address"></span></p>
-            <p><strong>Last Login:</strong> <span id="profile-last-login"></span></p>
-        </div>
-        <div id="recharge-app-ui" style="display:none;">
-            <header>
-                <h2 style="display:inline-block;">Mobile Recharge</h2>
-                <button id="profileBtn" style="float:left; margin-right:10px;">Profile</button>
-                <button id="logoutBtn" style="float:right;">Logout</button>
-            </header>
-            <div class="wallet-container">
-                <div class="wallet-title">Wallet Balance</div>
-                <div class="wallet-amount">₹ 0.00</div>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-left">
+                <i class="fas fa-bars menu-icon" id="menuBtn"></i> <span class="app-title">Home</span> 
             </div>
-            <form id="rechargeForm" class="recharge-form">
-                <label for="mobileNumber">Mobile Number:</label>
-                <input type="tel" id="mobileNumber" name="mobileNumber" pattern="[0-9]{10}" maxlength="10" required>
-    
-                <label for="operator">Operator:</label>
-                <select id="operator" name="operator" required>
-                    <option value="">Select Operator</option>
-                    <option value="Airtel">Airtel</option>
-                    <option value="Jio">Jio</option>
-                    <option value="VI">VI</option>
-                    <option value="BSNL">BSNL</option>
-                    <option value="MTNL">MTNL</option>
-                </select>
-                
-                <div id="plansContainer"></div>
-    
-                <label for="amount">Amount:</label>
-                <input type="number" id="amount" name="amount" required>
-    
-                <div class="recharge-actions">
-                    <button type="submit">Recharge</button>
+            <div class="header-right">
+                <div class="wallet-info">
+                    <i class="fas fa-wallet wallet-icon"></i>
+                    <span class="wallet-amount">₹ 0.00</span>
                 </div>
-            </form>
-    
-            <form id="addMoneyForm" class="add-money-form">
+            </div>
+        </header>
+
+        <div id="sidebar" class="sidebar">
+            <i class="fas fa-times close-sidebar-btn" id="closeSidebarBtn"></i>
+            <div class="sidebar-user-info">
+                <img src="user-placeholder.png" alt="User" class="sidebar-user-avatar"> <h4 id="sidebar-username">Guest User</h4>
+                <p id="sidebar-usermobile"></p>
+            </div>
+            <ul class="sidebar-menu-list">
+                <li><a href="#" id="profileBtnSidebar"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="#" id="logoutBtnSidebar"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+        </div>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div> <div id="recharge-app-ui" class="main-ui-content" style="display:none;">
+            <div class="hero-banner">
+                <img src="banner.jpg" alt="Promotional Banner"> </div>
+
+            <div class="feature-grid main-features-grid">
+                <div class="feature-item" id="addMoneyBtn">
+                    <i class="fas fa-plus-circle icon-add-money"></i>
+                    <span>Add Money</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-qrcode"></i>
+                    <span>UPI Scan QR</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-gift"></i>
+                    <span>CashBack</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-building"></i>
+                    <span>BBPS Service</span>
+                </div>
+            </div>
+
+            <div class="feature-grid utility-payments-grid">
+                <div class="feature-item" id="mobileRechargeBtn">
+                    <i class="fas fa-mobile-alt icon-mobile-recharge"></i>
+                    <span>Mobile Recharge</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Postpaid Bill Pay</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-satellite-dish"></i>
+                    <span>DTH Recharge</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Electricity Bill Pay</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-umbrella"></i>
+                    <span>Premium Payments</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-wifi"></i>
+                    <span>Broadband Bill Pay</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-phone-alt"></i>
+                    <span>Landline Bill Pay</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-gas-pump"></i>
+                    <span>Gas Bill Pay</span>
+                </div>
+                 <div class="feature-item">
+                    <i class="fas fa-tint"></i>
+                    <span>Water Bill Pay</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-tools"></i>
+                    <span>Utilities Payments</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-money-bill-transfer"></i>
+                    <span>Money Transfer</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-train"></i>
+                    <span>Railway Ticket</span>
+                </div>
+            </div>
+
+            <div id="recharge-form-section" class="content-section" style="display:none;">
+                <h3>Mobile Recharge</h3>
+                <form id="rechargeForm" class="recharge-form">
+                    <label for="mobileNumber">Mobile Number:</label>
+                    <input type="tel" id="mobileNumber" name="mobileNumber" pattern="[0-9]{10}" maxlength="10" required>
+        
+                    <label for="operator">Operator:</label>
+                    <select id="operator" name="operator" required>
+                        <option value="">Select Operator</option>
+                        <option value="airtel">Airtel</option>
+                        <option value="jio">Jio</option>
+                        <option value="vi">Vi</option>
+                        <option value="bsnl">BSNL</option>
+                        <option value="mtnl">MTNL</option>
+                    </select>
+                    
+                    <div id="plansContainer" class="plans-container"></div>
+        
+                    <label for="amount">Amount:</label>
+                    <input type="number" id="amount" name="amount" required>
+        
+                    <div class="recharge-actions">
+                        <button type="submit" class="primary-button">Recharge</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="add-money-section" class="content-section" style="display:none;">
                 <h3>Add Balance to Wallet</h3>
-                <label for="addAmount">Enter Amount:</label>
-                <input type="number" id="addAmount" name="addAmount" required>
-                <button type="submit">Add to Wallet</button>
-            </form>
-    
-            <div class="history-list-container">
+                <form id="addMoneyForm" class="add-money-form">
+                    <label for="addAmount">Enter Amount:</label>
+                    <input type="number" id="addAmount" name="addAmount" required>
+                    <button type="submit" class="primary-button">Add to Wallet</button>
+                </form>
+            </div>
+
+            <div id="profile-page" class="content-section" style="display:none;">
+                <h3>User Profile</h3>
+                <p><strong>Name:</strong> <span id="profile-name"></span></p>
+                <p><strong>Mobile:</strong> <span id="profile-mobile"></span></p>
+                <p><strong>Email:</strong> <span id="profile-email"></span></p>
+                <p><strong>Address:</strong> <span id="profile-address"></span></p>
+                <p><strong>Last Login:</strong> <span id="profile-last-login"></span></p>
+            </div>
+
+            <div id="history-section" class="content-section" style="display:none;">
                 <h3>Recharge History</h3>
                 <ul id="historyList" class="history-list">
-                    </ul>
+                </ul>
             </div>
-        </div>
-
-        <div id="auth-container" style="display:block;">
-            <h2 id="auth-title">Login</h2>
+            
+        </div> <div id="auth-container" class="auth-container" style="display:block;">
+            <h2 id="auth-title" class="auth-heading">Login</h2>
             <form id="auth-form" class="auth-form">
                 <input type="text" id="auth-name" class="auth-input" placeholder="Name" style="display:none;">
                 <input type="email" id="auth-email" class="auth-input" placeholder="Email" style="display:none;">
                 <input type="tel" id="auth-mobile" class="auth-input" placeholder="Mobile Number" pattern="[0-9]{10}" maxlength="10" required>
                 <input type="text" id="auth-address" class="auth-input" placeholder="Address" style="display:none;">
                 <input type="password" id="auth-password" class="auth-input" placeholder="Password" required>
-                <button type="submit" id="auth-button" class="auth-button">Login</button>
+                <button type="submit" id="auth-button" class="auth-button primary-button">Login</button>
             </form>
-            <p style="text-align: center; margin-top: 15px;">
-                <a href="#" id="toggle-signup">Don't have an account? Sign up</a><br>
-                <a href="#" id="forgot-password-link" style="margin-top: 10px; display:inline-block;">Forgot password?</a>
+            <p class="auth-toggle-link-container">
+                <a href="#" id="toggle-signup" class="auth-link">Don't have an account? Sign up</a><br>
+                <a href="#" id="forgot-password-link" class="auth-link">Forgot Password?</a>
             </p>
         </div>
-    </div>
 
-    <div id="forgot-password-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
-        <div style="background:white; padding:20px; border-radius:8px; width:100%; max-width:400px;">
-            <h3 style="text-align:center;">Forgot Password</h3>
-            <form id="forgot-password-form" style="display:flex; flex-direction:column; gap:10px;">
-                <input type="tel" id="forgot-mobile" class="auth-input" placeholder="Mobile Number" pattern="[0-9]{10}" maxlength="10" required>
-                <input type="password" id="forgot-new-password" class="auth-input" placeholder="New Password" required>
-                <button type="submit" class="auth-button" style="margin-top:10px;">Reset Password</button>
-            </form>
-            <button type="button" id="close-forgot-modal" style="margin-top:10px; background-color:#6c757d;" class="auth-button">Close</button>
+        <div id="forgot-password-modal" class="modal-overlay" style="display:none;">
+            <div class="modal-content">
+                <h3 class="modal-heading">Forgot Password</h3>
+                <form id="forgot-password-form" class="auth-form">
+                    <input type="tel" id="forgot-mobile" class="auth-input" placeholder="Mobile Number" pattern="[0-9]{10}" maxlength="10" required>
+                    <input type="password" id="forgot-new-password" class="auth-input" placeholder="New Password" required>
+                    <button type="submit" class="auth-button primary-button">Reset Password</button>
+                </form>
+                <button type="button" id="close-forgot-modal" class="auth-button secondary-button">Close</button>
+            </div>
         </div>
-    </div>
+
+    </div> <nav class="bottom-nav">
+        <a href="#" class="nav-item active" id="nav-home">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-recharge">
+            <i class="fas fa-bolt"></i>
+            <span>Recharge</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+        </a>
+    </nav>
+    
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script src="/validation.js"></script>
+    <script src="validation.js"></script>
 </body>
 </html>

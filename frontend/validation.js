@@ -1,9 +1,8 @@
 let userId = null;
 
-// --- IMPORTANT: Replace this with your actual Render backend URL ---
-// Example: const BASE_URL = "https://your-recharge-app-backend.onrender.com";
 const BASE_URL = "https://recharge-app-live.onrender.com"; // Your main Render app URL
 
+// --- UI Utility Functions ---
 function showLoading() {
     document.getElementById('loading-spinner').style.display = 'flex';
 }
@@ -12,12 +11,45 @@ function hideLoading() {
     document.getElementById('loading-spinner').style.display = 'none';
 }
 
+// Function to hide all content sections and show loading
+function hideAllContentSections() {
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.style.display = 'none';
+    });
+    // Hide main icon grids when a specific section is open
+    document.querySelector('.main-features-grid').style.display = 'none';
+    document.querySelector('.utility-payments-grid').style.display = 'none';
+    document.querySelector('.hero-banner').style.display = 'none';
+
+    // Reset header title to default if not specific to a page
+    document.querySelector('.app-title').textContent = 'Recharge'; 
+}
+
+// Function to show the main Home/Recharge view
+function showRechargeHome() {
+    hideAllContentSections();
+    document.querySelector('.hero-banner').style.display = 'block';
+    document.querySelector('.main-features-grid').style.display = 'grid';
+    document.querySelector('.utility-payments-grid').style.display = 'grid';
+    document.querySelector('.app-title').textContent = 'Home'; // Set header title
+    setActiveNavLink('nav-home');
+}
+
+function setActiveNavLink(navId) {
+    document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    document.getElementById(navId).classList.add('active');
+}
+
+
 async function waitForElements() {
     return new Promise(resolve => {
         const check = () => {
             const rechargeAppUI = document.getElementById('recharge-app-ui');
             const authContainer = document.getElementById('auth-container');
-            if (rechargeAppUI && authContainer) {
+            const navHome = document.getElementById('nav-home'); // Check for nav items too
+            if (rechargeAppUI && authContainer && navHome) {
                 resolve({ rechargeAppUI, authContainer });
             } else {
                 setTimeout(check, 50);
@@ -27,10 +59,12 @@ async function waitForElements() {
     });
 }
 
+// --- Initial Load and Login State Check ---
 document.addEventListener('DOMContentLoaded', async function() {
     try {
         const { rechargeAppUI, authContainer } = await waitForElements();
         checkLoginState(rechargeAppUI, authContainer);
+        setupEventListeners(); // Setup all event listeners after DOM is ready
     } catch (e) {
         console.error("DOM elements not found on page load:", e);
     } finally {
@@ -44,38 +78,113 @@ async function checkLoginState(rechargeAppUI, authContainer) {
         rechargeAppUI.style.display = 'block';
         authContainer.style.display = 'none';
         initApp();
+        showRechargeHome(); // Show main home content after login
     } else {
         rechargeAppUI.style.display = 'none';
         authContainer.style.display = 'block';
+        document.querySelector('.bottom-nav').style.display = 'none'; // Hide bottom nav on auth page
     }
 }
 
 async function initApp() {
     await fetchHistory();
     await updateWalletBalance();
-
-    document.getElementById('operator').addEventListener('change', async function() {
-        const operator = this.value;
-        if (operator) {
-            await fetchPlans(operator);
-        } else {
-            document.getElementById('plansContainer').innerHTML = '';
-        }
-    });
+    await updateProfileInfo(); // Fetch and display user profile in sidebar
+    document.querySelector('.bottom-nav').style.display = 'flex'; // Show bottom nav after init
 }
 
-document.getElementById('auth-form').addEventListener('submit', async function(event) {
+// --- Event Listeners Setup ---
+function setupEventListeners() {
+    // --- Auth Form ---
+    document.getElementById('auth-form').addEventListener('submit', handleAuthSubmit);
+    document.getElementById('toggle-signup').addEventListener('click', toggleSignUp);
+    document.getElementById('forgot-password-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('forgot-password-modal').style.display = 'flex';
+    });
+    document.getElementById('close-forgot-modal').addEventListener('click', function() {
+        document.getElementById('forgot-password-modal').style.display = 'none';
+        document.getElementById('forgot-password-form').reset();
+    });
+    document.getElementById('forgot-password-form').addEventListener('submit', handleForgotPassword);
+
+    // --- Sidebar and Logout ---
+    document.getElementById('menuBtn').addEventListener('click', toggleSidebar);
+    document.getElementById('closeSidebarBtn').addEventListener('click', toggleSidebar);
+    document.getElementById('sidebarOverlay').addEventListener('click', toggleSidebar);
+    document.getElementById('logoutBtnSidebar').addEventListener('click', handleLogout);
+    
+    // --- Bottom Navigation ---
+    document.getElementById('nav-home').addEventListener('click', function(e) {
+        e.preventDefault();
+        showRechargeHome(); // Show default home content
+        document.querySelector('.app-title').textContent = 'Home'; // Set header title
+    });
+    document.getElementById('nav-recharge').addEventListener('click', function(e) {
+        e.preventDefault();
+        hideAllContentSections();
+        document.getElementById('recharge-form-section').style.display = 'block';
+        document.querySelector('.app-title').textContent = 'Recharge'; // Set header title
+        setActiveNavLink('nav-recharge');
+    });
+    document.getElementById('nav-more').addEventListener('click', function(e) {
+        e.preventDefault();
+        hideAllContentSections();
+        document.getElementById('profile-page').style.display = 'block'; // Or a 'More' specific page
+        document.getElementById('history-section').style.display = 'block'; // Show history in More page
+        document.querySelector('.app-title').textContent = 'More'; // Set header title
+        setActiveNavLink('nav-more');
+    });
+
+    // --- Feature Icons ---
+    document.getElementById('mobileRechargeBtn').addEventListener('click', function() {
+        hideAllContentSections();
+        document.getElementById('recharge-form-section').style.display = 'block';
+        document.querySelector('.app-title').textContent = 'Mobile Recharge'; // Specific header title
+    });
+
+    document.getElementById('addMoneyBtn').addEventListener('click', function() {
+        hideAllContentSections();
+        document.getElementById('add-money-section').style.display = 'block';
+        document.querySelector('.app-title').textContent = 'Add Money'; // Specific header title
+    });
+    
+    // Profile button in sidebar
+    document.getElementById('profileBtnSidebar').addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleSidebar(); // Close sidebar first
+        hideAllContentSections();
+        document.getElementById('profile-page').style.display = 'block';
+        document.querySelector('.app-title').textContent = 'Profile'; // Specific header title
+    });
+
+    // Dummy functionality for other icons
+    document.querySelectorAll('.feature-item:not(#mobileRechargeBtn):not(#addMoneyBtn)').forEach(item => {
+        item.addEventListener('click', function() {
+            alert('Coming Soon!');
+        });
+    });
+
+    // --- Recharge Form ---
+    document.getElementById('operator').addEventListener('change', handleOperatorChange);
+    document.getElementById('rechargeForm').addEventListener('submit', handleRechargeSubmit);
+    document.getElementById('addMoneyForm').addEventListener('submit', handleAddMoneySubmit);
+}
+
+
+// --- Handlers for various events ---
+async function handleAuthSubmit(event) {
     event.preventDefault();
     const mobileNumber = document.getElementById('auth-mobile').value;
     const password = document.getElementById('auth-password').value;
-    const isLogin = document.getElementById('auth-button').textContent === 'Login';
+    const isLogin = document.getElementById('auth-button').textContent.toLowerCase() === 'login'; // Use .toLowerCase() for robustness
 
     if (mobileNumber.length !== 10) {
-        alert('Kripya sahi 10-ankon ka mobile number daalein.');
+        alert('Please enter a valid 10-digit mobile number.');
         return;
     }
 
-    let endpoint = isLogin ? `${BASE_URL}/login` : `${BASE_URL}/signup`; // BASE_URL added
+    let endpoint = isLogin ? `${BASE_URL}/login` : `${BASE_URL}/signup`;
     let bodyData;
 
     if (isLogin) {
@@ -113,12 +222,18 @@ document.getElementById('auth-form').addEventListener('submit', async function(e
                 const { rechargeAppUI, authContainer } = await waitForElements();
                 checkLoginState(rechargeAppUI, authContainer);
             } else {
+                // After signup, switch to login form
                 document.getElementById('auth-title').textContent = 'Login';
                 document.getElementById('auth-button').textContent = 'Login';
-                document.getElementById('toggle-signup').textContent = 'Already have an account? Login';
+                document.getElementById('toggle-signup').textContent = 'Don\'t have an account? Sign up';
                 document.getElementById('auth-name').style.display = 'none';
                 document.getElementById('auth-email').style.display = 'none';
                 document.getElementById('auth-address').style.display = 'none';
+                // Reset signup fields but keep mobile for quick login
+                document.getElementById('auth-name').value = '';
+                document.getElementById('auth-email').value = '';
+                document.getElementById('auth-address').value = '';
+                document.getElementById('auth-password').value = ''; // Clear password
             }
         } else {
             alert(data.message);
@@ -128,30 +243,31 @@ document.getElementById('auth-form').addEventListener('submit', async function(e
     } finally {
         hideLoading();
     }
-});
+}
 
-document.getElementById('toggle-signup').addEventListener('click', function(e) {
+function toggleSignUp(e) {
     e.preventDefault();
     const title = document.getElementById('auth-title');
     const button = document.getElementById('auth-button');
     const nameField = document.getElementById('auth-name');
     const emailField = document.getElementById('auth-email');
     const addressField = document.getElementById('auth-address');
+    const toggleLink = document.getElementById('toggle-signup');
 
-    if (title.textContent === 'Login') {
+    if (title.textContent.toLowerCase() === 'login') {
         title.textContent = 'Sign Up';
         button.textContent = 'Sign Up';
-        this.textContent = 'Already have an account? Login';
+        toggleLink.textContent = 'Already have an account? Login';
         nameField.style.display = 'block';
         emailField.style.display = 'block';
         addressField.style.display = 'block';
         nameField.required = true;
         emailField.required = true;
-        addressField.required = false;
+        addressField.required = false; // Address can be optional
     } else {
         title.textContent = 'Login';
         button.textContent = 'Login';
-        this.textContent = 'Don\'t have an account? Sign up';
+        toggleLink.textContent = 'Don\'t have an account? Sign up';
         nameField.style.display = 'none';
         emailField.style.display = 'none';
         addressField.style.display = 'none';
@@ -159,32 +275,23 @@ document.getElementById('toggle-signup').addEventListener('click', function(e) {
         emailField.required = false;
         addressField.required = false;
     }
-});
+}
 
-document.getElementById('logoutBtn').addEventListener('click', async function() {
+async function handleLogout() {
     localStorage.removeItem('userId');
     const { rechargeAppUI, authContainer } = await waitForElements();
     checkLoginState(rechargeAppUI, authContainer);
-});
+    toggleSidebar(); // Close sidebar on logout
+}
 
-document.getElementById('forgot-password-link').addEventListener('click', function(e) {
-    e.preventDefault();
-    document.getElementById('forgot-password-modal').style.display = 'flex';
-});
-
-document.getElementById('close-forgot-modal').addEventListener('click', function() {
-    document.getElementById('forgot-password-modal').style.display = 'none';
-    document.getElementById('forgot-password-form').reset();
-});
-
-document.getElementById('forgot-password-form').addEventListener('submit', async function(event) {
+async function handleForgotPassword(event) {
     event.preventDefault();
     const mobileNumber = document.getElementById('forgot-mobile').value;
     const newPassword = document.getElementById('forgot-new-password').value;
     
     showLoading();
     try {
-        const response = await fetch(`${BASE_URL}/forgot-password`, { // BASE_URL added
+        const response = await fetch(`${BASE_URL}/forgot-password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ mobileNumber, newPassword }),
@@ -203,22 +310,31 @@ document.getElementById('forgot-password-form').addEventListener('submit', async
     } finally {
         hideLoading();
     }
-});
+}
 
-document.getElementById('rechargeForm').addEventListener('submit', async function(event) {
+async function handleOperatorChange() {
+    const operator = this.value;
+    if (operator) {
+        await fetchPlans(operator);
+    } else {
+        document.getElementById('plansContainer').innerHTML = '';
+    }
+}
+
+async function handleRechargeSubmit(event) {
     event.preventDefault();
     const mobileNumber = document.getElementById('mobileNumber').value;
     const operator = document.getElementById('operator').value;
     const amount = document.getElementById('amount').value;
     
     if (!mobileNumber || mobileNumber.length !== 10 || !operator || !amount) {
-        alert('Kripya sahi jaankari daalein.');
+        alert('Please enter correct details.');
         return;
     }
 
     showLoading();
     try {
-        const response = await fetch(`${BASE_URL}/recharge`, { // BASE_URL added
+        const response = await fetch(`${BASE_URL}/recharge`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId, mobileNumber, operator, amount: Number(amount) }),
@@ -239,41 +355,41 @@ document.getElementById('rechargeForm').addEventListener('submit', async functio
     } finally {
         hideLoading();
     }
-});
+}
 
-document.getElementById('addMoneyForm').addEventListener('submit', async function(event) {
+async function handleAddMoneySubmit(event) {
     event.preventDefault();
     const amount = document.getElementById('addAmount').value;
     if (amount <= 0) {
-        alert('Kripya ek valid amount daalein.');
+        alert('Please enter a valid amount.');
         return;
     }
     startPayment();
-});
+}
 
+
+// --- Core Functions (Payment, Plans, History, Wallet, Profile) ---
 async function startPayment() {
     const amount = document.getElementById('addAmount').value;
     if (!amount) {
-        alert("Kripya amount daalein.");
+        alert("Please enter amount.");
         return;
     }
     if (!userId) {
-        alert("Paisa dalne ke liye kripya pehle login karein.");
+        alert("Please login first to add money.");
         return;
     }
     
     showLoading();
     try {
-        // BASE_URL added here
         const userResponse = await fetch(`${BASE_URL}/user/${userId}`); 
         const userData = await userResponse.json();
         if(!userData.success) {
-            alert("User details nahi mil payi!");
+            alert("User details not found!");
             return;
         }
         const { name, email, mobileNumber } = userData.user;
 
-        // BASE_URL added here
         const orderResponse = await fetch(`${BASE_URL}/createOrder`, { 
             method: 'POST',
             headers: {
@@ -285,7 +401,7 @@ async function startPayment() {
         
         if (orderData.id) {
             const options = {
-                key: 'rzp_test_REG7HP4iXJBXHc', // This key should ideally also come from an environment variable for security
+                key: 'rzp_test_REG7HP4iXJBXHc', 
                 amount: orderData.amount,
                 currency: "INR",
                 name: "Recharge App",
@@ -294,7 +410,6 @@ async function startPayment() {
                 handler: async function (response) {
                     alert("Payment Successful!");
                     
-                    // BASE_URL added here
                     const updateResponse = await fetch(`${BASE_URL}/add-balance`, { 
                         method: 'POST',
                         headers: {
@@ -307,9 +422,9 @@ async function startPayment() {
                         await updateWalletBalance();
                         await fetchHistory();
                         document.getElementById('addMoneyForm').reset();
-                        alert("Wallet mein balance jod diya gaya hai!");
+                        alert("Balance added to wallet!");
                     } else {
-                        alert("Balance update karne mein error hua!");
+                        alert("Error updating balance!");
                     }
                 },
                 prefill: {
@@ -318,17 +433,17 @@ async function startPayment() {
                     contact: mobileNumber,
                 },
                 theme: {
-                    color: "#3399cc"
+                    color: "#6a1b9a" // Match app theme
                 }
             };
             const rzp1 = new Razorpay(options);
             rzp1.open();
         } else {
-            alert("Order banane mein error hua!");
+            alert("Error creating order!");
         }
     } catch (error) {
         console.error("Payment start error:", error);
-        alert("Payment start karne mein error hua!");
+        alert("Error starting payment!");
     } finally {
         hideLoading();
     }
@@ -338,7 +453,6 @@ async function fetchPlans(operator) {
     try {
         const plansContainer = document.getElementById('plansContainer');
         plansContainer.innerHTML = '';
-        // BASE_URL added here
         const response = await fetch(`${BASE_URL}/plans/${operator}`); 
         const data = await response.json();
 
@@ -346,10 +460,10 @@ async function fetchPlans(operator) {
             data.plans.forEach(plan => {
                 const planCard = document.createElement('div');
                 planCard.classList.add('plan-card');
-                planCard.style.cssText = 'border: 1px solid #ddd; padding: 10px; border-radius: 8px; margin-top: 10px; cursor: pointer; background-color: #f9f9f9;';
+                // Removed inline styles, now using style.css classes
                 planCard.innerHTML = `
-                    <div class="plan-amount" style="font-weight: bold;">₹${plan.amount}</div>
-                    <div class="plan-description" style="font-size: 14px;">${plan.description}</div>
+                    <div class="plan-amount">₹${plan.amount}</div>
+                    <div class="plan-description">${plan.description}</div>
                 `;
                 planCard.addEventListener('click', () => {
                     document.getElementById('amount').value = plan.amount;
@@ -357,11 +471,11 @@ async function fetchPlans(operator) {
                 plansContainer.appendChild(planCard);
             });
         } else {
-            console.error('Failed to fetch plans:', data.message);
+            plansContainer.innerHTML = '<p style="text-align:center; color:#6a1b9a;">No plans available for this operator.</p>';
         }
     } catch (error) {
         console.error('Error fetching plans:', error);
-        document.getElementById('plansContainer').innerHTML = '<p style="text-align:center; color:red;">Plans load nahi ho paye.</p>';
+        document.getElementById('plansContainer').innerHTML = '<p style="text-align:center; color:red;">Could not load plans.</p>';
     }
 }
 
@@ -369,13 +483,12 @@ async function fetchHistory() {
     try {
         const historyList = document.getElementById('historyList');
         historyList.innerHTML = '';
-        // BASE_URL added here
         const response = await fetch(`${BASE_URL}/history/${userId}`); 
         const data = await response.json();
         
         if (response.ok) {
             if (data.transactions.length === 0) {
-                historyList.innerHTML = '<li class="history-item">Koi history nahi hai.</li>';
+                historyList.innerHTML = '<li class="history-item">No history available.</li>';
             } else {
                 data.transactions.forEach(item => {
                     const newHistoryItem = document.createElement('li');
@@ -391,11 +504,11 @@ async function fetchHistory() {
                     if (item.type === 'recharge') {
                         description = `Recharge for ${item.mobileNumber} (${item.operator})`;
                         amountDisplay = `- ₹${Math.abs(item.amount)}`;
-                        amountColor = '#dc3545';
+                        amountColor = '#dc3545'; // Red for negative
                     } else if (item.type === 'add_money') {
                         description = `Balance added`;
                         amountDisplay = `+ ₹${item.amount}`;
-                        amountColor = '#28a745';
+                        amountColor = '#28a745'; // Green for positive
                     }
                     
                     newHistoryItem.innerHTML = `
@@ -410,15 +523,16 @@ async function fetchHistory() {
             }
         } else {
             console.error('Failed to fetch history:', data.message);
+            historyList.innerHTML = '<li class="history-item">Could not load history.</li>';
         }
     } catch (error) {
         console.error('Network Error:', error);
+        historyList.innerHTML = '<li class="history-item">Network error, could not load history.</li>';
     }
 }
 
 async function updateWalletBalance() {
     try {
-        // BASE_URL added here
         const response = await fetch(`${BASE_URL}/wallet/${userId}`); 
         const data = await response.json();
 
@@ -426,8 +540,47 @@ async function updateWalletBalance() {
             document.querySelector('.wallet-amount').textContent = `₹ ${data.walletBalance.toFixed(2)}`;
         } else {
             console.error('Failed to fetch wallet balance:', data.message);
+            document.querySelector('.wallet-amount').textContent = `₹ Error`;
         }
     } catch (error) {
         console.error('Network Error:', error);
+        document.querySelector('.wallet-amount').textContent = `₹ Error`;
+    }
+}
+
+async function updateProfileInfo() {
+    if (!userId) return;
+    try {
+        const response = await fetch(`${BASE_URL}/user/${userId}`);
+        const data = await response.json();
+        if (response.ok && data.user) {
+            const user = data.user;
+            document.getElementById('profile-name').textContent = user.name || 'N/A';
+            document.getElementById('profile-mobile').textContent = user.mobileNumber || 'N/A';
+            document.getElementById('profile-email').textContent = user.email || 'N/A';
+            document.getElementById('profile-address').textContent = user.address || 'N/A';
+            document.getElementById('profile-last-login').textContent = user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'N/A';
+
+            // Update sidebar info
+            document.getElementById('sidebar-username').textContent = user.name || 'Guest User';
+            document.getElementById('sidebar-usermobile').textContent = user.mobileNumber || '';
+        } else {
+            console.error('Failed to fetch profile info:', data.message);
+        }
+    } catch (error) {
+        console.error('Network Error fetching profile:', error);
+    }
+}
+
+// --- Sidebar Toggle Logic ---
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('visible');
+    } else {
+        sidebar.classList.add('open');
+        overlay.classList.add('visible');
     }
 }
