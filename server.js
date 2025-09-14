@@ -14,16 +14,16 @@ app.use(express.json()); // To parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // To parse URL-encoded request bodies
 
 // MongoDB Connection
-const MONGODB_URI = "mongodb+srv://RechargeApp:Samir123@cluster0.hoe3ggd.mongodb.net/rechargeApp?retryWrites=true&w=majority&appName=Cluster0";
+const MONGO_URI = "mongodb+srv://RechargeApp:Samir123@cluster0.hoe3ggd.mongodb.net/rechargeApp?retryWrites=true&w=majority&appName=Cluster0";
 // 
 
 
-if (!MONGODB_URI) {
+if (!MONGO_URI) {
     console.error('FATAL ERROR: MONGODB_URI is not defined in environment variables.');
     process.exit(1);
 }
 
-mongoose.connect(MONGODB_URI)
+mongoose.connect(MONGO_URI)
     .then(() => console.log('MongoDB connected successfully'))
     .catch(err => {
         console.error('MongoDB connection error:', err.message);
