@@ -1,4 +1,3 @@
-require('dotenv').config(); // <--- यह लाइन होनी चाहिए!
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -15,7 +14,8 @@ app.use(express.json()); // To parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // To parse URL-encoded request bodies
 
 // MongoDB Connection
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://RechargeApp:Samir123@cluster0.hoe3ggd.mongodb.net/rechargeApp?retryWrites=true&w=majority&appName=Cluster0";
+const MONGODB_URI = "mongodb+srv://RechargeApp:Samir123@cluster0.hoe3ggd.mongodb.net/rechargeApp?retryWrites=true&w=majority&appName=Cluster0";
+// 
 
 
 if (!MONGODB_URI) {
@@ -30,9 +30,9 @@ mongoose.connect(MONGODB_URI)
         process.exit(1); // Exit process if cannot connect to DB
     });
 
-// ------------------------------------------
+
 // Mongoose Schemas and Models (Defined within server.js for simplicity)
-// ------------------------------------------
+
 
 // CommissionSlab Schema
 const CommissionSlabSchema = new mongoose.Schema({
@@ -110,11 +110,9 @@ const TransactionSchema = new mongoose.Schema({
 
 const Transaction = mongoose.model('Transaction', TransactionSchema);
 
-// ------------------------------------------
 // Razorpay Setup
-// ------------------------------------------
-const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
+const RAZORPAY_KEY_ID = "rzp_test_REG7HP4iXJBXHc";
+const RAZORPAY_KEY_SECRET = "W95kFgueS85rDDrTB5EY0FBr";
 
 if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
     console.error('FATAL ERROR: RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET is not defined.');
