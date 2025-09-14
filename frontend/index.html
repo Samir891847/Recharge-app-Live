@@ -4,16 +4,21 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recharge App</title>
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
     <link rel="stylesheet" href="style.css"> 
+    <script>
+        // *** IMPORTANT: Replace 'https://your-app-backend.onrender.com' with your actual Render backend URL ***
+        window.BASE_URL = 'https://recharge-app-live.onrender.com'; 
+    </script>
 </head>
 <body>
     <div id="loading-spinner" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column;">
         <div class="loading-spinner"></div>
         <p>Loading...</p>
     </div>
+
+    <div id="message" class="app-message hidden"></div>
 
     <div class="app-container">
         <header class="app-header">
@@ -23,7 +28,7 @@
             <div class="header-right">
                 <div class="wallet-info">
                     <i class="fas fa-wallet wallet-icon"></i>
-                    <span class="wallet-amount">₹ 0.00</span>
+                    <span id="userWalletBalance" class="wallet-amount">Balance: ₹0.00</span>
                 </div>
             </div>
         </header>
@@ -31,96 +36,157 @@
         <div id="sidebar" class="sidebar">
             <i class="fas fa-times close-sidebar-btn" id="closeSidebarBtn"></i>
             <div class="sidebar-user-info">
-                <img src="user-placeholder.png" alt="User" class="sidebar-user-avatar"> <h4 id="sidebar-username">Guest User</h4>
-                <p id="sidebar-usermobile"></p>
+                <img src="user-placeholder.png" alt="User" class="sidebar-user-avatar">
+                <h4 id="currentUserName">Hi, Guest</h4>
+                <p id="currentUserRole"></p> 
             </div>
             <ul class="sidebar-menu-list">
-                <li><a href="#" id="profileBtnSidebar"><i class="fas fa-user"></i> Profile</a></li>
-                <li><a href="#" id="logoutBtnSidebar"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                </ul>
+                <li id="showProfileBtn"><a href="#"><i class="fas fa-user"></i> Profile</a></li>
+                <li id="showHistoryBtn"><a href="#"><i class="fas fa-history"></i> Transactions</a></li>
+                
+                <div id="roleBasedNav">
+                    <li id="showManageDownlineBtn" class="role-specific-btn hidden"><a href="#"><i class="fas fa-users-cog"></i> Manage Downline</a></li>
+                    <li id="showBalanceTransferBtn" class="role-specific-btn hidden"><a href="#"><i class="fas fa-exchange-alt"></i> Balance Transfer</a></li>
+                    <li id="showCommissionReportBtn" class="role-specific-btn hidden"><a href="#"><i class="fas fa-chart-line"></i> Commission Report</a></li>
+                </div>
+
+                <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
         </div>
-        <div class="sidebar-overlay" id="sidebarOverlay"></div> <div id="recharge-app-ui" class="main-ui-content" style="display:none;">
-            <div class="hero-banner">
-                <img src="banner.jpg" alt="Promotional Banner"> </div>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-            <div class="feature-grid main-features-grid">
-                <div class="feature-item" id="addMoneyBtn">
-                    <i class="fas fa-plus-circle icon-add-money"></i>
-                    <span>Add Money</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-qrcode"></i>
-                    <span>UPI Scan QR</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-gift"></i>
-                    <span>CashBack</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-building"></i>
-                    <span>BBPS Service</span>
-                </div>
-            </div>
+        <div class="main-content-wrapper">
 
-            <div class="feature-grid utility-payments-grid">
-                <div class="feature-item" id="mobileRechargeBtn">
-                    <i class="fas fa-mobile-alt icon-mobile-recharge"></i>
-                    <span>Mobile Recharge</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-file-invoice"></i>
-                    <span>Postpaid Bill Pay</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-satellite-dish"></i>
-                    <span>DTH Recharge</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-lightbulb"></i>
-                    <span>Electricity Bill Pay</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-umbrella"></i>
-                    <span>Premium Payments</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-wifi"></i>
-                    <span>Broadband Bill Pay</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-phone-alt"></i>
-                    <span>Landline Bill Pay</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-gas-pump"></i>
-                    <span>Gas Bill Pay</span>
-                </div>
-                 <div class="feature-item">
-                    <i class="fas fa-tint"></i>
-                    <span>Water Bill Pay</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-tools"></i>
-                    <span>Utilities Payments</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-money-bill-transfer"></i>
-                    <span>Money Transfer</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-train"></i>
-                    <span>Railway Ticket</span>
-                </div>
-            </div>
+            <section id="loginSection" class="app-section auth-section">
+                <h2 class="auth-heading">Login</h2>
+                <form id="loginForm" class="auth-form">
+                    <input type="tel" id="loginMobile" class="auth-input" placeholder="Mobile Number" pattern="[0-9]{10}" maxlength="10" required>
+                    <input type="password" id="loginPassword" class="auth-input" placeholder="Password" required>
+                    <button type="submit" class="auth-button primary-button">Login</button>
+                </form>
+                <p class="auth-toggle-link-container">
+                    <a href="#" id="showSignupForm" class="auth-link">Don't have an account? Sign up</a><br>
+                    <a href="#" id="forgotPasswordBtn" class="auth-link">Forgot Password?</a>
+                </p>
+            </section>
 
-            <div id="recharge-form-section" class="content-section" style="display:none;">
+            <section id="signupSection" class="app-section auth-section hidden">
+                <h2 class="auth-heading">Sign Up</h2>
+                <form id="signupForm" class="auth-form">
+                    <input type="text" id="signupName" class="auth-input" placeholder="Name" required>
+                    <input type="email" id="signupEmail" class="auth-input" placeholder="Email (Optional)">
+                    <input type="tel" id="signupMobile" class="auth-input" placeholder="Mobile Number" pattern="[0-9]{10}" maxlength="10" required>
+                    <input type="text" id="signupAddress" class="auth-input" placeholder="Address (Optional)">
+                    <input type="password" id="signupPassword" class="auth-input" placeholder="Password" required>
+                    <button type="submit" class="auth-button primary-button">Sign Up</button>
+                </form>
+                <p class="auth-toggle-link-container">
+                    <a href="#" id="showLoginForm" class="auth-link">Already have an account? Login</a>
+                </p>
+            </section>
+
+            <section id="otpSection" class="app-section auth-section hidden">
+                <h2 class="auth-heading">Forgot Password - Send OTP</h2>
+                <form id="otpForm" class="auth-form">
+                    <input type="tel" id="otpMobile" class="auth-input" placeholder="Mobile Number" pattern="[0-9]{10}" maxlength="10" required>
+                    <button type="submit" class="auth-button primary-button">Send OTP</button>
+                </form>
+            </section>
+
+            <section id="resetPasswordSection" class="app-section auth-section hidden">
+                <h2 class="auth-heading">Reset Password</h2>
+                <form id="resetPasswordForm" class="auth-form">
+                    <input type="tel" id="resetMobile" class="auth-input" placeholder="Mobile Number" pattern="[0-9]{10}" maxlength="10" required>
+                    <input type="text" id="resetOtp" class="auth-input" placeholder="Enter OTP" required>
+                    <input type="password" id="newPassword" class="auth-input" placeholder="New Password" required>
+                    <button type="submit" class="auth-button primary-button">Reset Password</button>
+                </form>
+            </section>
+
+            <section id="dashboardSection" class="app-section hidden">
+                <div class="hero-banner">
+                    <img src="banner.jpg" alt="Promotional Banner">
+                </div>
+
+                <div class="feature-grid main-features-grid">
+                    <div class="feature-item" id="showAddMoneyForm">
+                        <i class="fas fa-plus-circle icon-add-money"></i>
+                        <span>Add Money</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-qrcode"></i>
+                        <span>UPI Scan QR</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-gift"></i>
+                        <span>CashBack</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-building"></i>
+                        <span>BBPS Service</span>
+                    </div>
+                </div>
+
+                <div class="feature-grid utility-payments-grid">
+                    <div class="feature-item" id="showRechargeForm">
+                        <i class="fas fa-mobile-alt icon-mobile-recharge"></i>
+                        <span>Mobile Recharge</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-file-invoice"></i>
+                        <span>Postpaid Bill Pay</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-satellite-dish"></i>
+                        <span>DTH Recharge</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Electricity Bill Pay</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-umbrella"></i>
+                        <span>Premium Payments</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-wifi"></i>
+                        <span>Broadband Bill Pay</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <span>Landline Bill Pay</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-gas-pump"></i>
+                        <span>Gas Bill Pay</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-tint"></i>
+                        <span>Water Bill Pay</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-tools"></i>
+                        <span>Utilities Payments</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-money-bill-transfer"></i>
+                        <span>Money Transfer</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-train"></i>
+                        <span>Railway Ticket</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="rechargeSection" class="app-section hidden">
                 <h3>Mobile Recharge</h3>
                 <form id="rechargeForm" class="recharge-form">
-                    <label for="mobileNumber">Mobile Number:</label>
-                    <input type="tel" id="mobileNumber" name="mobileNumber" pattern="[0-9]{10}" maxlength="10" required>
-        
-                    <label for="operator">Operator:</label>
-                    <select id="operator" name="operator" required>
+                    <label for="rechargeMobile">Mobile Number:</label>
+                    <input type="tel" id="rechargeMobile" name="rechargeMobile" pattern="[0-9]{10}" maxlength="10" required>
+
+                    <label for="operatorSelect">Operator:</label>
+                    <select id="operatorSelect" name="operatorSelect" required>
                         <option value="">Select Operator</option>
                         <option value="airtel">Airtel</option>
                         <option value="jio">Jio</option>
@@ -128,77 +194,98 @@
                         <option value="bsnl">BSNL</option>
                         <option value="mtnl">MTNL</option>
                     </select>
-                    
-                    <div id="plansContainer" class="plans-container"></div>
-        
-                    <label for="amount">Amount:</label>
-                    <input type="number" id="amount" name="amount" required>
-        
+
+                    <div id="planDetails" class="plans-container">
+                        </div>
+
+                    <label for="selectedAmount">Amount:</label>
+                    <input type="number" id="selectedAmount" name="selectedAmount" placeholder="Select a plan or enter amount" required readonly>
+
                     <div class="recharge-actions">
                         <button type="submit" class="primary-button">Recharge</button>
                     </div>
                 </form>
-            </div>
+            </section>
 
-            <div id="add-money-section" class="content-section" style="display:none;">
+            <section id="addMoneySection" class="app-section hidden">
                 <h3>Add Balance to Wallet</h3>
-                <form id="addMoneyForm" class="add-money-form">
-                    <label for="addAmount">Enter Amount:</label>
-                    <input type="number" id="addAmount" name="addAmount" required>
+                <form id="addBalanceForm" class="add-money-form">
+                    <label for="addMoneyAmount">Enter Amount:</label>
+                    <input type="number" id="addMoneyAmount" name="addMoneyAmount" required>
                     <button type="submit" class="primary-button">Add to Wallet</button>
                 </form>
-            </div>
+            </section>
 
-            <div id="profile-page" class="content-section" style="display:none;">
+            <section id="profileSection" class="app-section hidden">
                 <h3>User Profile</h3>
-                <p><strong>Name:</strong> <span id="profile-name"></span></p>
-                <p><strong>Mobile:</strong> <span id="profile-mobile"></span></p>
-                <p><strong>Email:</strong> <span id="profile-email"></span></p>
-                <p><strong>Address:</strong> <span id="profile-address"></span></p>
-                <p><strong>Last Login:</strong> <span id="profile-last-login"></span></p>
-            </div>
+                <div class="profile-details">
+                    <p><strong>Name:</strong> <span id="profileName"></span></p>
+                    <p><strong>Mobile:</strong> <span id="profileMobile"></span></p>
+                    <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+                    <p><strong>Address:</strong> <span id="profileAddress"></span></p>
+                    <p><strong>Wallet Balance:</strong> <span id="profileWalletBalance"></span></p>
+                    <p><strong>Role:</strong> <span id="profileRole"></span></p> <p><strong>Status:</strong> <span id="profileStatus"></span></p> <p><strong>Commission Slab:</strong> <span id="profileCommissionSlab"></span></p> <p><strong>Referred By:</strong> <span id="profileReferredBy"></span></p> <p><strong>Last Login:</strong> <span id="profileLastLogin"></span></p>
+                </div>
+            </section>
 
-            <div id="history-section" class="content-section" style="display:none;">
-                <h3>Recharge History</h3>
+            <section id="historySection" class="app-section hidden">
+                <h3>Transaction History</h3>
                 <ul id="historyList" class="history-list">
-                </ul>
-            </div>
-            
-        </div> <div id="auth-container" class="auth-container" style="display:block;">
-            <h2 id="auth-title" class="auth-heading">Login</h2>
-            <form id="auth-form" class="auth-form">
-                <input type="text" id="auth-name" class="auth-input" placeholder="Name" style="display:none;">
-                <input type="email" id="auth-email" class="auth-input" placeholder="Email" style="display:none;">
-                <input type="tel" id="auth-mobile" class="auth-input" placeholder="Mobile Number" pattern="[0-9]{10}" maxlength="10" required>
-                <input type="text" id="auth-address" class="auth-input" placeholder="Address" style="display:none;">
-                <input type="password" id="auth-password" class="auth-input" placeholder="Password" required>
-                <button type="submit" id="auth-button" class="auth-button primary-button">Login</button>
-            </form>
-            <p class="auth-toggle-link-container">
-                <a href="#" id="toggle-signup" class="auth-link">Don't have an account? Sign up</a><br>
-                <a href="#" id="forgot-password-link" class="auth-link">Forgot Password?</a>
-            </p>
-        </div>
+                    </ul>
+            </section>
 
-        <div id="forgot-password-modal" class="modal-overlay" style="display:none;">
-            <div class="modal-content">
-                <h3 class="modal-heading">Forgot Password</h3>
-                <form id="forgot-password-form" class="auth-form">
-                    <input type="tel" id="forgot-mobile" class="auth-input" placeholder="Mobile Number" pattern="[0-9]{10}" maxlength="10" required>
-                    <input type="password" id="forgot-new-password" class="auth-input" placeholder="New Password" required>
-                    <button type="submit" class="auth-button primary-button">Reset Password</button>
+            <section id="manageDownlineSection" class="app-section hidden">
+                <h3>Manage Downline Users</h3>
+
+                <h4>Create New Downline User</h4>
+                <form id="createDownlineForm" class="auth-form">
+                    <input type="text" id="downlineName" class="auth-input" placeholder="Name" required>
+                    <input type="tel" id="downlineMobile" class="auth-input" placeholder="Mobile Number" pattern="[0-9]{10}" maxlength="10" required>
+                    <input type="password" id="downlinePassword" class="auth-input" placeholder="Password" required>
+                    
+                    <label for="downlineRole">Role:</label>
+                    <select id="downlineRole" name="downlineRole" class="auth-input" required>
+                        <option value="">Select Role</option>
+                        <option value="distributor">Distributor</option>
+                        <option value="retailer">Retailer</option>
+                    </select>
+
+                    <label for="downlineCommissionSlab">Commission Slab:</label>
+                    <select id="downlineCommissionSlab" name="downlineCommissionSlab" class="auth-input" required>
+                        <option value="">Select Commission Slab</option>
+                        </select>
+
+                    <button type="submit" class="auth-button primary-button">Create Downline User</button>
                 </form>
-                <button type="button" id="close-forgot-modal" class="auth-button secondary-button">Close</button>
-            </div>
-        </div>
 
-    </div> <nav class="bottom-nav">
+                <h4>Your Downline</h4>
+                <ul id="downlineList" class="downline-list">
+                    </ul>
+            </section>
+
+            <section id="balanceTransferSection" class="app-section hidden">
+                <h3>Transfer Balance to Downline</h3>
+                <form id="balanceTransferForm" class="add-money-form">
+                    <label for="transferMobile">Receiver Mobile Number:</label>
+                    <input type="tel" id="transferMobile" name="transferMobile" pattern="[0-9]{10}" maxlength="10" required>
+                    <label for="transferAmount">Amount to Transfer:</label>
+                    <input type="number" id="transferAmount" name="transferAmount" required>
+                    <button type="submit" class="primary-button">Transfer Balance</button>
+                </form>
+            </section>
+
+            <section id="commissionReportSection" class="app-section hidden">
+                <h3>Your Commission Report</h3>
+                <ul id="commissionReportList" class="history-list">
+                    </ul>
+            </section>
+
+        </div> </div> <nav class="bottom-nav">
         <a href="#" class="nav-item active" id="nav-home">
             <i class="fas fa-home"></i>
             <span>Home</span>
         </a>
-        <a href="#" class="nav-item" id="nav-recharge">
-            <i class="fas fa-bolt"></i>
+        <a href="#" class="nav-item" id="nav-recharge-bottom"> <i class="fas fa-bolt"></i>
             <span>Recharge</span>
         </a>
         <a href="#" class="nav-item" id="nav-more">
@@ -206,7 +293,7 @@
             <span>More</span>
         </a>
     </nav>
-    
+
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="validation.js"></script>
 </body>
