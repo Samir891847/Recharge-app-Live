@@ -1,0 +1,616 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+.app-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    max-width: 600px; /* Optional: Constrain app width for larger screens */
+    width: 100%;
+    margin: 0 auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Loading Spinner --- */
+#loading-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* --- Header --- */
+.app-header {
+    background-color: #6a1b9a; /* Deep purple */
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.menu-icon {
+    font-size: 24px;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.app-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.wallet-info {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 5px 12px;
+}
+
+.wallet-icon {
+    font-size: 18px;
+    margin-right: 8px;
+}
+
+.wallet-amount {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+    height: 100%;
+    width: 0; /* Initially hidden */
+    position: fixed;
+    z-index: 200;
+    top: 0;
+    left: 0;
+    background-color: #fff;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    max-width: 250px;
+}
+
+.sidebar.open {
+    width: 250px;
+}
+
+.close-sidebar-btn {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    font-size: 30px;
+    cursor: pointer;
+    color: #6a1b9a;
+}
+
+.sidebar-user-info {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.sidebar-user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+    border: 2px solid #6a1b9a;
+}
+
+.sidebar-user-info h4 {
+    margin: 5px 0 0;
+    color: #333;
+}
+.sidebar-user-info p {
+    margin: 0;
+    color: #777;
+    font-size: 14px;
+}
+
+.sidebar-menu-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu-list li a {
+    padding: 12px 20px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #333;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidebar-menu-list li a i {
+    margin-right: 10px;
+    color: #6a1b9a;
+}
+
+.sidebar-menu-list li a:hover {
+    background-color: #f0f0f0;
+}
+
+.sidebar-overlay {
+    display: none; /* Initially hidden */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 150;
+    cursor: pointer;
+}
+
+.sidebar-overlay.visible {
+    display: block;
+}
+
+
+/* --- Main UI Content (Home, Recharge, More) --- */
+.main-ui-content {
+    flex-grow: 1;
+    padding-bottom: 70px; /* Space for bottom nav */
+}
+
+.hero-banner {
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.hero-banner img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columns for icons */
+    gap: 10px;
+    padding: 10px;
+    background-color: #ffffff;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.utility-payments-grid {
+    grid-template-columns: repeat(4, 1fr); /* 4 columns for utility icons */
+}
+
+.feature-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 5px;
+    text-align: center;
+    color: #555;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    border-radius: 8px;
+}
+
+.feature-item:hover {
+    background-color: #f5f5f5;
+    transform: translateY(-2px);
+}
+
+.feature-item i {
+    font-size: 28px;
+    margin-bottom: 5px;
+    color: #6a1b9a; /* Icon color */
+    background-color: #e3f2fd; /* Light background for icons */
+    padding: 10px;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+/* Specific icon colors if needed */
+.icon-add-money i { color: #4CAF50; background-color: #e8f5e9; } /* Green */
+.icon-mobile-recharge i { color: #2196F3; background-color: #e3f2fd; } /* Blue */
+
+
+/* --- Content Sections (Recharge Form, Add Money, Profile, History) --- */
+.content-section {
+    padding: 20px;
+    background-color: #ffffff;
+    margin: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.content-section h3 {
+    text-align: center;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 22px;
+}
+
+/* --- Recharge Form (shared styles) --- */
+.recharge-form, .add-money-form, .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.recharge-form label, .add-money-form label {
+    font-weight: bold;
+    color: #555;
+    font-size: 14px;
+}
+
+.recharge-form input, .recharge-form select,
+.add-money-form input,
+.auth-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+.primary-button {
+    padding: 12px;
+    background-color: #6a1b9a; /* Deep purple */
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.primary-button:hover {
+    background-color: #4a148c; /* Darker purple */
+}
+
+.secondary-button {
+    padding: 10px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.secondary-button:hover {
+    background-color: #5a6268;
+}
+
+/* --- Plans Container --- */
+.plans-container {
+    margin-top: 15px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); /* Responsive grid */
+    gap: 10px;
+    justify-content: center;
+    padding: 0;
+}
+
+.plan-card {
+    background-color: #eaf5ff;
+    border: 1px solid #cce5ff;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.plan-card:hover {
+    background-color: #d1eaff;
+}
+.plan-amount {
+    font-weight: bold;
+    font-size: 18px;
+    color: #6a1b9a; /* Deep purple */
+}
+.plan-description {
+    font-size: 12px;
+    color: #555;
+    margin-top: 5px;
+}
+
+/* --- History List --- */
+.history-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+.history-item {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.history-details {
+    display: flex;
+    flex-direction: column;
+}
+.history-main {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+.history-sub {
+    font-size: 12px;
+    color: #777;
+}
+.history-amount {
+    font-size: 18px;
+    font-weight: bold;
+}
+/* Colors set by JS for history amount */
+
+/* --- Auth Container (Login/Signup) --- */
+.auth-container {
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    margin: 20px auto; /* Centered */
+}
+
+.auth-heading {
+    text-align: center;
+    color: #6a1b9a;
+    margin-bottom: 25px;
+    font-size: 24px;
+}
+
+.auth-link-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.auth-link {
+    color: #6a1b9a;
+    text-decoration: none;
+    font-size: 14px;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}
+
+/* --- Modal Overlays (Forgot Password) --- */
+.modal-overlay {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative;
+}
+
+.modal-heading {
+    text-align: center;
+    color: #6a1b9a;
+    margin-bottom: 20px;
+}
+
+/* --- Bottom Navigation --- */
+.bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #ffffff;
+    border-top: 1px solid #eee;
+    padding: 8px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: 600px; /* Match app-container max-width */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+    z-index: 100;
+    margin: 0 auto; /* Center on larger screens */
+    left: 0;
+    right: 0;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #777;
+    font-size: 12px;
+    padding: 5px;
+    flex: 1; /* Distribute space evenly */
+}
+
+.nav-item i {
+    font-size: 22px;
+    margin-bottom: 3px;
+}
+
+.nav-item.active {
+    color: #6a1b9a; /* Active color */
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .app-container {
+        margin: 0; /* Full width on smaller screens */
+        box-shadow: none;
+    }
+    .bottom-nav {
+        left: 0;
+        right: 0;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-header {
+        padding: 10px 15px;
+    }
+    .menu-icon {
+        font-size: 22px;
+    }
+    .app-title {
+        font-size: 18px;
+    }
+    .wallet-icon, .wallet-amount {
+        font-size: 16px;
+    }
+    .feature-grid {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns on very small screens */
+        gap: 8px;
+        padding: 8px;
+    }
+    .feature-item i {
+        font-size: 24px;
+        width: 44px;
+        height: 44px;
+    }
+    .feature-item span {
+        font-size: 11px;
+    }
+    .content-section {
+        padding: 15px;
+        margin: 10px;
+    }
+    .content-section h3 {
+        font-size: 20px;
+    }
+    .recharge-form input, .recharge-form select,
+    .add-money-form input,
+    .auth-input {
+        padding: 10px;
+        font-size: 14px;
+    }
+    .primary-button {
+        padding: 10px;
+        font-size: 14px;
+    }
+    .plan-card {
+        padding: 8px;
+    }
+    .plan-amount {
+        font-size: 16px;
+    }
+    .plan-description {
+        font-size: 11px;
+    }
+    .history-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 12px;
+    }
+    .history-main {
+        font-size: 15px;
+    }
+    .history-sub {
+        font-size: 11px;
+    }
+    .history-amount {
+        font-size: 16px;
+        margin-top: 5px;
+    }
+    .auth-container {
+        padding: 20px;
+        margin: 10px auto;
+    }
+    .modal-content {
+        padding: 20px;
+    }
+    .bottom-nav {
+        padding: 5px 0;
+    }
+    .nav-item i {
+        font-size: 20px;
+    }
+    .nav-item span {
+        font-size: 10px;
+    }
+}
